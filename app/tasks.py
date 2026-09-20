@@ -31,20 +31,20 @@ def process_job(job_id):
                     for c in cons: db.add(Concept(invoice_id=inv.id,**c))
                     job.valid+=1
             except Exception as e:
-    import traceback
-    print(traceback.format_exc())
+                import traceback
+                print(traceback.format_exc())
 
-    db.rollback()
-    job=db.get(Job,job_id)
-    job.errors+=1
-    job.message=(job.message or "")+f"{name}: {e}\n"
+                db.rollback()
+                job=db.get(Job,job_id)
+                job.errors+=1
+                job.message=(job.message or "")+f"{name}: {e}\n"
             job.processed+=1; db.commit()
         job.status="completed"; db.commit()
     except Exception as e:
-    import traceback
-    print(traceback.format_exc())
+        import traceback
+        print(traceback.format_exc())
 
-    job.status="failed"
-    job.message=str(e)
-    db.commit()
+        job.status="failed"
+        job.message=str(e)
+        db.commit()
     finally: db.close()
