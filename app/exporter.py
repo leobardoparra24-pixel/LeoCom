@@ -7,6 +7,11 @@ from sqlalchemy import select
 from .db import SessionLocal
 from .models import Invoice,Concept
 HEADERS = [
+"NUM_CTA_BCO",
+"NUM_OPERACION",
+"FECHA_OPE_BANCO",
+"VALOR_OPE_BANCO",
+"tc"
 "f_id",
 "f_rfc",
 "f_razon_social",
