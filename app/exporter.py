@@ -60,10 +60,13 @@ HEADERS = [
 "d_sat_prod",
 "d_sat_unid"
 ]
-def row(i,c,first):
+def row(i,c,first,aux_map):
+
+    uuid = str(i.uuid or "").strip().upper()
+
+    aux = aux_map.get(uuid, {})
 
     return [
-
         i.id,
         i.issuer_rfc,
         i.issuer_name,
