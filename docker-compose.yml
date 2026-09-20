@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: cfdi
+      POSTGRES_USER: cfdi
+      POSTGRES_PASSWORD: cambia_esta_clave
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+  web:
+    build: .
+    environment:
+      DATABASE_URL: postgresql+psycopg://cfdi:cambia_esta_clave@db:5432/cfdi
+      CELERY_BROKER_URL: redis://redis:6379/0
+      SECRET_KEY: cambia-por-una-clave-larga-y-aleatoria
+      DATA_DIR: /data
+    ports:
+      - "8000:8000"
+    volumes:
+      - appdata:/data
+    depends_on: [db, redis]
+    restart: unless-stopped
+  worker:
+    build: .
+    command: celery -A app.tasks.celery worker --loglevel=INFO --concurrency=4
+    environment:
+      DATABASE_URL: postgresql+psycopg://cfdi:cambia_esta_clave@db:5432/cfdi
+      CELERY_BROKER_URL: redis://redis:6379/0
+      SECRET_KEY: cambia-por-una-clave-larga-y-aleatoria
+      DATA_DIR: /data
+    volumes:
+      - appdata:/data
+    depends_on: [db, redis]
+    restart: unless-stopped
+volumes:
+  pgdata:
+  appdata:
