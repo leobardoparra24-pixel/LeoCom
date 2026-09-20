@@ -54,8 +54,68 @@ HEADERS = [
 "d_sat_prod",
 "d_sat_unid"
 ]
-def row(i,c,first):
-    return [i.uuid,i.source_file,i.version,i.serie,i.folio,i.issue_date,i.stamp_date,i.voucher_type,i.issuer_rfc,i.issuer_name,i.issuer_regime,i.receiver_rfc,i.receiver_name,i.receiver_regime,i.receiver_zip,i.cfdi_use,i.currency,i.exchange_rate,i.subtotal,i.discount,i.total,i.payment_form,i.payment_method,i.expedition_place,i.export_code,i.pac_rfc,c.line_no,c.product_key,c.identification,c.quantity,c.unit_key,c.unit,c.description,c.unit_value,c.amount,c.discount,c.tax_object,c.vat_base,c.vat_rate,c.vat_transferred,c.vat_withheld,c.isr_withheld,c.ieps_transferred,1 if first else 0,i.total if first else 0]
+def row(i,c):
+
+    return [
+
+        i.id,
+        i.issuer_rfc,
+        i.issuer_name,
+        i.folio,
+        "",
+        i.subtotal,
+        i.discount,
+        c.ieps_transferred,
+        c.vat_transferred,
+        c.vat_withheld,
+        c.isr_withheld,
+        i.total,
+        i.currency,
+        i.payment_method,
+        i.payment_form,
+        i.cfdi_use,
+        i.uuid,
+
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+
+        c.quantity,
+        c.description,
+        c.unit_value,
+        c.amount,
+        c.discount,
+        c.ieps_transferred,
+        c.vat_transferred,
+        c.vat_withheld,
+        c.isr_withheld,
+
+        (
+            (c.amount or 0)
+            - (c.discount or 0)
+            + (c.vat_transferred or 0)
+            + (c.ieps_transferred or 0)
+            - (c.vat_withheld or 0)
+            - (c.isr_withheld or 0)
+        ),
+
+        c.ieps_transferred,
+        c.vat_transferred,
+        c.vat_withheld,
+        c.isr_withheld,
+
+        c.product_key,
+        c.unit_key
+
+    ]
 def create_export():
     out=Path(os.getenv("DATA_DIR","/tmp"))/"exports"; out.mkdir(parents=True,exist_ok=True)
     path=out/"detalle_cfdi.xlsx"; wb=Workbook(write_only=True); ws=wb.create_sheet("Detalle_CFDI")
