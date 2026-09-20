@@ -30,7 +30,7 @@ def process_job(job_id):
                     inv=Invoice(**invd); db.add(inv); db.flush()
                     for c in cons: db.add(Concept(invoice_id=inv.id,**c))
                     job.valid+=1
-           except Exception as e:
+            except Exception as e:
     import traceback
     print(traceback.format_exc())
 
