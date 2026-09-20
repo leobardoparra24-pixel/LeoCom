@@ -123,6 +123,33 @@ def row(i,c,first):
 
     ]
 def create_export():
+    jobs = db.query(Job).all()
+
+aux_map = {}
+
+for job in jobs:
+
+    if not job.aux_file:
+        continue
+
+    try:
+
+        df = pd.read_excel(job.aux_file)
+
+        df["UUID"] = (
+            df["UUID"]
+            .astype(str)
+            .str.upper()
+            .str.strip()
+        )
+
+        aux_map.update(
+            df.set_index("UUID")
+              .to_dict("index")
+        )
+
+    except:
+        pass
     out=Path(os.getenv("DATA_DIR","/tmp"))/"exports"; out.mkdir(parents=True,exist_ok=True)
     path=out/"detalle_cfdi.xlsx"; wb=Workbook(write_only=True); ws=wb.create_sheet("Detalle_CFDI")
     ws.append(HEADERS); db=SessionLocal(); last=None
