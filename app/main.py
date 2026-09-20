@@ -31,7 +31,7 @@ def upload(file:UploadFile=File(...),s=Depends(db)):
     path=data_dir/f"{uuid.uuid4().hex}{ext}"
     with path.open("wb") as f: shutil.copyfileobj(file.file,f)
     job=Job(filename=file.filename,stored_path=str(path)); s.add(job); s.commit(); s.refresh(job)
-    process_job.delay(job.id)
+    process_job(job.id)    
     return RedirectResponse("/",303)
 @app.get("/export")
 def export_all():
