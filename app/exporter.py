@@ -54,7 +54,7 @@ HEADERS = [
 "d_sat_prod",
 "d_sat_unid"
 ]
-def row(i,c,first):
+ws.append(row(i,c))
 
     return [
 
