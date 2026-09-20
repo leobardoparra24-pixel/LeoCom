@@ -122,5 +122,5 @@ def create_export():
     ws.append(HEADERS); db=SessionLocal(); last=None
     q=select(Invoice,Concept).join(Concept,Concept.invoice_id==Invoice.id).order_by(Invoice.id,Concept.line_no)
     for i,c in db.execute(q).yield_per(2000):
-        first=i.id!=last; ws.append(row(i,c,first)); last=i.id
+        first=i.id!=last; ws.append(row(i,c)); last=i.id
     db.close(); wb.save(path); return path
