@@ -62,7 +62,7 @@ def row(i,c,first):
         i.issuer_rfc,
         i.issuer_name,
         i.folio,
-        "",
+        i.issue_date,
         i.subtotal,
         i.discount,
         c.ieps_transferred,
