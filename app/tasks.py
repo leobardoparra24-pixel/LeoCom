@@ -18,7 +18,6 @@ def entries(path):
                 if info.file_size>50*1024*1024: raise ValueError(f"XML demasiado grande: {info.filename}")
                 yield info.filename,z.read(info)
     else: yield p.name,p.read_bytes()
-@celery.task
 def process_job(job_id):
     db=SessionLocal(); job=db.get(Job,job_id)
     try:
