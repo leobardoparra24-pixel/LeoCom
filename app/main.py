@@ -24,7 +24,11 @@ def home(request:Request,s=Depends(db)):
     jobs=s.scalars(select(Job).order_by(Job.id.desc()).limit(30)).all()
     return templates.TemplateResponse("index.html",{"request":request,"jobs":jobs})
 @app.post("/upload")
-def upload(file:UploadFile=File(...),s=Depends(db)):
+def upload(
+    xmlfile: UploadFile = File(...),
+    auxfile: UploadFile = File(...),
+    s=Depends(db)
+):
     ext=Path(file.filename or "").suffix.lower()
     if ext not in (".xml",".zip"): raise HTTPException(400,"Solo se permiten XML o ZIP")
     data_dir=Path(os.getenv("DATA_DIR","/tmp"))/"uploads"; data_dir.mkdir(parents=True,exist_ok=True)
