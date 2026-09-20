@@ -67,6 +67,11 @@ def row(i,c,first,aux_map):
     aux = aux_map.get(uuid, {})
 
     return [
+        aux.get("NUM_CTA_BCO",""),
+        aux.get("NUM_OPERACION",""),
+        aux.get("FECHA_OPE_BANCO",""),
+        aux.get("VALOR_OPE_BANCO",""),
+        aux.get("tc","")
         i.id,
         i.issuer_rfc,
         i.issuer_name,
