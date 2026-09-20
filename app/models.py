@@ -9,6 +9,7 @@ class User(Base):
     password_hash: Mapped[str]=mapped_column(String(255))
     role: Mapped[str]=mapped_column(String(30),default="operator")
 class Job(Base):
+    aux_file = Column(String)
     __tablename__="jobs"
     id: Mapped[int]=mapped_column(primary_key=True)
     filename: Mapped[str]=mapped_column(String(255))
