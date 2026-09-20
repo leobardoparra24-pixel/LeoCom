@@ -1,4 +1,5 @@
 import os, zipfile
+import pandas as pd    
 from pathlib import Path
 from celery import Celery
 from sqlalchemy.exc import IntegrityError
@@ -36,6 +37,20 @@ def process_job(job_id):
 
                 db.rollback()
                 job=db.get(Job,job_id)
+                aux_df = pd.read_excel(job.aux_file)
+
+aux_df["UUID"] = (
+    aux_df["UUID"]
+    .astype(str)
+    .str.upper()
+    .str.strip()
+)
+
+aux_map = (
+    aux_df
+    .set_index("UUID")
+    .to_dict("index")
+)
                 job.errors+=1
                 job.message=(job.message or "")+f"{name}: {e}\n"
             job.processed+=1; db.commit()
