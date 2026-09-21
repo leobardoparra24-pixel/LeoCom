@@ -33,7 +33,8 @@ def upload(
     if ext not in (".xml",".zip"): raise HTTPException(400,"Solo se permiten XML o ZIP")
     data_dir=Path(os.getenv("DATA_DIR","/tmp"))/"uploads"; data_dir.mkdir(parents=True,exist_ok=True)
     path=data_dir/f"{uuid.uuid4().hex}{ext}"
-    with path.open("wb") as f: shutil.copyfileobj(file.file,f)
+    with path.open("wb") as f:
+    shutil.copyfileobj(xmlfile.file,f)
 job = Job(
     filename=xmlfile.filename,
     stored_path=str(path),
