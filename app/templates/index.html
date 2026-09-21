@@ -2,32 +2,31 @@
 
     <h2>Nueva carga</h2>
 
-    <form
-        action="/upload"
-        method="post"
-        enctype="    type="file"
-            name="xmlfile"
-            accept=".xml,.zip"
-            required
-        >
+<form action="/upload"
+      method="post"
+      enctype="    type="file"
+        name="xmlfile"
+        accept=".xml,.zip"
+        required
+    >
 
-        <br><br>
+    <br><br>
 
-        <label>Excel auxiliar</label><br>
+    <label>Excel auxiliar</label><br>
 
-        <input
-            type="file"
-            name="auxfile"
-            accept=".xlsx,.xls"
-            required
-        >
+    <input
+        type="file"
+        name="auxfile"
+        accept=".xlsx,.xls"
+        required
+    >
 
-        <br><br>
+    <br><br>
 
-        <button type="submit">
-            Cargar y procesar
-        </button>
+    <button type="submit">
+        Cargar y procesar
+    </button>
 
-    </form>
+</form>
 
 </section><section class="card"><h2>Trabajos recientes</h2><table><thead><tr><th>ID</th><th>Archivo</th><th>Estado</th><th>Avance</th><th>Correctos</th><th>Duplicados</th><th>Errores</th></tr></thead><tbody>{% for j in jobs %}<tr><td>{{j.id}}</td><td>{{j.filename}}</td><td class="{{j.status}}">{{j.status}}</td><td>{{j.processed}} / {{j.total}}</td><td>{{j.valid}}</td><td>{{j.duplicates}}</td><td title="{{j.message or ''}}">{{j.errors}}</td></tr>{% endfor %}</tbody></table></section><section class="card"><a class="btn" href="/export">Generar Excel de una sola hoja</a><p>El archivo contiene una fila por concepto. Los datos generales se repiten y la columna “Total CFDI para suma” evita duplicar totales.</p></section></main><script>setTimeout(()=>location.reload(),10000)</script></body></html>
