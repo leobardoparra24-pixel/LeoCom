@@ -34,7 +34,7 @@ def upload(
     data_dir=Path(os.getenv("DATA_DIR","/tmp"))/"uploads"; data_dir.mkdir(parents=True,exist_ok=True)
     path=data_dir/f"{uuid.uuid4().hex}{ext}"
     with path.open("wb") as f: shutil.copyfileobj(file.file,f)
-    job = Job(
+job = Job(
     filename=xmlfile.filename,
     stored_path=str(path),
     aux_file=str(aux_path)
