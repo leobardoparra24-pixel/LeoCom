@@ -29,34 +29,56 @@ def upload(
     auxfile: UploadFile = File(...),
     s=Depends(db)
 ):
+
     ext = Path(xmlfile.filename or "").suffix.lower()
-    if ext not in (".xml",".zip"): raise HTTPException(400,"Solo se permiten XML o ZIP")
-    data_dir = Path(os.getenv("DATA_DIR","/tmp")) / "uploads"
-data_dir.mkdir(parents=True, exist_ok=True)
 
-path = data_dir / f"{uuid.uuid4().hex}{ext}"
+    if ext not in (".xml",".zip"):
+        raise HTTPException(
+            400,
+            "Solo se permiten XML o ZIP"
+        )
 
-with path.open("wb") as f:
-    shutil.copyfileobj(xmlfile.file, f)
+    data_dir = Path(
+        os.getenv("DATA_DIR","/tmp")
+    ) / "uploads"
 
-aux_path = data_dir / f"aux_{uuid.uuid4().hex}.xlsx"
+    data_dir.mkdir(
+        parents=True,
+        exist_ok=True
+    )
 
-with open(aux_path, "wb") as f:
-    shutil.copyfileobj(auxfile.file, f)
+    path = data_dir / f"{uuid.uuid4().hex}{ext}"
 
-job = Job(
-    filename=xmlfile.filename,
-    stored_path=str(path),
-    aux_file=str(aux_path)
-)
+    with path.open("wb") as f:
+        shutil.copyfileobj(
+            xmlfile.file,
+            f
+        )
 
-s.add(job)
-s.commit()
-s.refresh(job)
+    aux_path = (
+        data_dir /
+        f"aux_{uuid.uuid4().hex}.xlsx"
+    )
 
-process_job(job.id)
+    with open(aux_path,"wb") as f:
+        shutil.copyfileobj(
+            auxfile.file,
+            f
+        )
 
-return RedirectResponse("/",303)
+    job = Job(
+        filename=xmlfile.filename,
+        stored_path=str(path),
+        aux_file=str(aux_path)
+    )
+
+    s.add(job)
+    s.commit()
+    s.refresh(job)
+
+    process_job(job.id)
+
+    return RedirectResponse("/",303)
 @app.get("/export")
 def export_all():
     path=create_export(); return FileResponse(path,filename="Detalle_CFDI.xlsx")
