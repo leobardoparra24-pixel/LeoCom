@@ -20,45 +20,79 @@ def entries(path):
                 yield info.filename,z.read(info)
     else: yield p.name,p.read_bytes()
 def process_job(job_id):
-    db=SessionLocal(); job=db.get(Job,job_id)
+
+    db = SessionLocal()
+    job = db.get(Job, job_id)
+
     try:
-        items=list(entries(job.stored_path)); job.total=len(items); job.status="processing"; db.commit()
-        for name,data in items:
-            try:
-                invd,cons=parse_cfdi(data,name)
-                if db.query(Invoice).filter(Invoice.uuid==invd["uuid"]).first(): job.duplicates+=1
-                else:
-                    inv=Invoice(**invd); db.add(inv); db.flush()
-                    for c in cons: db.add(Concept(invoice_id=inv.id,**c))
-                    job.valid+=1
-            except Exception as e:
-            
-                import traceback
-                print(traceback.format_exc())
-            
-                db.rollback()
-            
-                job = db.get(Job, job_id)
-            
-                job.errors += 1
-            
-                job.message = (
-                    job.message or ""
-                ) + f"{name}: {e}\n"
-            
-            job.processed += 1
-            db.commit()
-                    
-        job.status="completed"
+
+        items = list(entries(job.stored_path))
+
+        job.total = len(items)
+        job.status = "processing"
+
         db.commit()
-                
-except Exception as e:
-    import traceback
-    print(traceback.format_exc())
-          
-    job.status="failed"
-    job.message=str(e)
-    db.commit()
-            
-finally: 
-    db.close()
+
+        for name, data in items:
+
+            try:
+
+                invd, cons = parse_cfdi(data, name)
+
+                if db.query(Invoice).filter(
+                    Invoice.uuid == invd["uuid"]
+                ).first():
+
+                    job.duplicates += 1
+
+                else:
+
+                    inv = Invoice(**invd)
+
+                    db.add**nv)
+                    db.flush(**
+                    for c in con**
+                        db.add(
+**                          Concept**                                i**oice_id=inv.id,
+                 **             **c
+                **          )
+                     ** )
+
+                    job.valid**= 1
+
+            except Exception**s e:
+
+                import trac**ack
+                print(traceba**.format_exc())
+
+                d**rollback()
+
+                job =**b.get(Job, job_id)
+
+             ** job.errors += 1
+
+               **ob.message = (
+                  **job.message or ""
+               ** + f"{name}: {e}\n"
+
+            **b.processed += 1
+
+            db.commit()
+
+        job.status = "completed"
+
+        db.commit()
+
+    except Exception as e:
+
+        import traceback
+        print(traceback.format_exc())
+
+        job.status = "failed"
+        job.message = str(e)
+
+        db.commit()
+
+    finally:
+
+        db.close()
