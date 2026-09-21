@@ -29,7 +29,6 @@ def upload(
     auxfile: UploadFile = File(...),
     s=Depends(db)
 ):
-
     ext = Path(xmlfile.filename or "").suffix.lower()
 
     if ext not in (".xml",".zip"):
