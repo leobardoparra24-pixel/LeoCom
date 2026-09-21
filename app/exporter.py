@@ -6,7 +6,7 @@ from openpyxl.styles import Font,PatternFill
 from openpyxl.utils import get_column_letter
 from sqlalchemy import select
 from .db import SessionLocal
-from .models import Invoice,Concept
+from .models import Invoice, Concept, Job
 HEADERS = [
 "NUM_CTA_BCO",
 "NUM_OPERACION",
