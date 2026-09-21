@@ -9,11 +9,11 @@ class User(Base):
     password_hash: Mapped[str]=mapped_column(String(255))
     role: Mapped[str]=mapped_column(String(30),default="operator")
 class Job(Base):
-    aux_file: Mapped[str | None] = mapped_column(Text, nullable=True)
     __tablename__="jobs"
     id: Mapped[int]=mapped_column(primary_key=True)
     filename: Mapped[str]=mapped_column(String(255))
     stored_path: Mapped[str]=mapped_column(Text)
+    aux_file: Mapped[str | None] = mapped_column(Text, nullable=True)
     status: Mapped[str]=mapped_column(String(30),default="pending")
     total: Mapped[int]=mapped_column(Integer,default=0)
     processed: Mapped[int]=mapped_column(Integer,default=0)
