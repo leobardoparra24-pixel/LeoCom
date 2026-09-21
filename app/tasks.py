@@ -21,60 +21,73 @@ def entries(path):
     else: yield p.name,p.read_bytes()
 def process_job(job_id):
 
-    d**= SessionLocal()
-    job = db.get**ob, job_id)
+    db = SessionLocal()
+    job = db.get(Job, job_id)
 
     try:
 
-        it**s = list(entries(job.stored_path)**
+        items = list(entries(job.stored_path))
+
         job.total = len(items)
- **     job.status = "processing"
+        job.status = "processing"
 
- **     db.commit()
+        db.commit()
 
-        for nam** data in items:
+        for name, data in items:
 
-            try:**                invd, cons = pars**cfdi(data, name)
+            try:
 
-               **f db.query(Invoice).filter(
-     **             Invoice.uuid == invd**uuid"]
-                ).first():**                    job.duplicate**+= 1
+                invd, cons = parse_cfdi(data, name)
+
+                if db.query(Invoice).filter(
+                    Invoice.uuid == invd["uuid"]
+                ).first():
+
+                    job.duplicates += 1
 
                 else:
 
-    **              inv = Invoice(**inv**
+                    inv = Invoice(**invd)
 
-                    db.add(inv)**                   db.flush()
+                    db.add(inv)
+                    db.flush()
 
-  **                for c in cons:
-  **                    db.add(
-     **                     Concept(
-   **                           invoic**id=inv.id,
-                      **        **c
-                     **     )
+                    for c in cons:
+
+                        db.add(
+                            Concept(
+                                invoice_id=inv.id,
+                                **c
+                            )
                         )
-**                   job.valid += 1**            except Exception as e**
-                import traceback**               print(traceback.fo**at_exc())
 
-                db.rol**ack()
+                    job.valid += 1
 
-                job = db.g**(Job, job_id)
+            except Exception as e:
 
-                jo**errors += 1
+                import traceback
+                print(traceback.format_exc())
 
-                job.**ssage = (
-                    job**essage or ""
-                ) + **{name}: {e}\n"
+                db.rollback()
 
-            job.p**cessed += 1
-            db.commit**
+                job = db.get(Job, job_id)
 
-        job.status = "completed**        db.commit()
+                job.errors += 1
 
-    except E**eption as e:
+                job.message = (
+                    job.message or ""
+                ) + f"{name}: {e}\n"
 
-        import trac**ack
-        print(traceback.forma**exc())
+            job.processed += 1
+            db.commit()
+
+        job.status = "completed"
+        db.commit()
+
+    except Exception as e:
+
+        import traceback
+        print(traceback.format_exc())
 
         job.status = "failed"
         job.message = str(e)
