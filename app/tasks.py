@@ -46,11 +46,11 @@ def process_job(job_id):
                     job.message or ""
                 ) + f"{name}: {e}\n"
             
-        job.processed += 1
+            job.processed += 1
+            db.commit()
+                    
+        job.status="completed"
         db.commit()
-                
-    job.status="completed"
-    db.commit()
                 
 except Exception as e:
     import traceback
