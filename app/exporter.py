@@ -12,7 +12,7 @@ HEADERS = [
 "NUM_OPERACION",
 "FECHA_OPE_BANCO",
 "VALOR_OPE_BANCO",
-"tc"
+"tc",
 "f_id",
 "f_rfc",
 "f_razon_social",
