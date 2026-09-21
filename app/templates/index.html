@@ -2,29 +2,30 @@
 
 <h2>Nueva carga</h2>
 
-<form action="/upload" method="post" enctype="abel><br>
-    <input
-        id="xmlfile"
+<form
+    action="/upload"
+    method="post"
+    enctype="multipart/form   id="xmlfile"
         type="file"
         name="xmlfile"
-        accept=".xml,.zip,application/xml,application/zip"
+        accept=".xml,.zip"
         required
     >
 
     <br><br>
 
     <label for="auxfile">Excel auxiliar</label><br>
+
     <input
         id="auxfile"
         type="file"
         name="auxfile"
-        accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+        accept=".xlsx,.xls"
         required
     >
 
     <br><br>
 
     <button type="submit">Cargar y procesar</button>
-
 </form>
 </section><section class="card"><h2>Trabajos recientes</h2><table><thead><tr><th>ID</th><th>Archivo</th><th>Estado</th><th>Avance</th><th>Correctos</th><th>Duplicados</th><th>Errores</th></tr></thead><tbody>{% for j in jobs %}<tr><td>{{j.id}}</td><td>{{j.filename}}</td><td class="{{j.status}}">{{j.status}}</td><td>{{j.processed}} / {{j.total}}</td><td>{{j.valid}}</td><td>{{j.duplicates}}</td><td title="{{j.message or ''}}">{{j.errors}}</td></tr>{% endfor %}</tbody></table></section><section class="card"><a class="btn" href="/export">Generar Excel de una sola hoja</a><p>El archivo contiene una fila por concepto. Los datos generales se repiten y la columna “Total CFDI para suma” evita duplicar totales.</p></section></main></body></html>
