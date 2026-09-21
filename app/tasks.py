@@ -21,16 +21,16 @@ def entries(path):
     else: yield p.name,p.read_bytes()
 def process_job(job_id):
     db=SessionLocal(); job=db.get(Job,job_id)
-    try:
-        items=list(entries(job.stored_path)); job.total=len(items); job.status="processing"; db.commit()
-        for name,data in items:
-            try:
-                invd,cons=parse_cfdi(data,name)
-                if db.query(Invoice).filter(Invoice.uuid==invd["uuid"]).first(): job.duplicates+=1
-                else:
-                    inv=Invoice(**invd); db.add(inv); db.flush()
-                    for c in cons: db.add(Concept(invoice_id=inv.id,**c))
-                    job.valid+=1
+try:
+    items=list(entries(job.stored_path)); job.total=len(items); job.status="processing"; db.commit()
+    for name,data in items:
+        try:
+            invd,cons=parse_cfdi(data,name)
+            if db.query(Invoice).filter(Invoice.uuid==invd["uuid"]).first(): job.duplicates+=1
+            else:
+                inv=Invoice(**invd); db.add(inv); db.flush()
+                for c in cons: db.add(Concept(invoice_id=inv.id,**c))
+                job.valid+=1
 except Exception as e:
 
     import traceback
@@ -49,11 +49,14 @@ except Exception as e:
     job.processed += 1
 
     db.commit()
-    except Exception as e:
-        import traceback
-        print(traceback.format_exc())
+    
+except Exception as e:
+    import traceback
+    print(traceback.format_exc())
 
-        job.status="failed"
-        job.message=str(e)
-        db.commit()
-    finally: db.close()
+    job.status="failed"
+    job.message=str(e)
+    db.commit()
+
+finally: 
+    db.close()
