@@ -31,20 +31,20 @@ def upload(
 ):
     ext = Path(xmlfile.filename or "").suffix.lower()
 
-    if ext not in (".xml", ".zip"):
-        raise HTTPException(
-            400,
-            "Solo se permiten XML o ZIP"
-        )
-
-    data_dir = Path(
-        os.getenv("DATA_DIR", "/tmp")
-    ) / "uploads"
-
-    data_dir.mkdir(
-        parents=True,
-        exist_ok=True
+    if ext not in (".xml",".zip"):
+    raise HTTPException(
+        400,
+        "Solo se permiten XML o ZIP"
     )
+
+data_dir = Path(
+    os.getenv("DATA_DIR","/tmp")
+) / "uploads"
+
+data_dir.mkdir(
+    parents=True,
+    exist_ok=True
+)
 
     path = data_dir / f"{uuid.uuid4().hex}{ext}"
 
