@@ -165,11 +165,13 @@ def create_export():
     path=out/"detalle_cfdi.xlsx"; wb=Workbook(write_only=True); ws=wb.create_sheet("Detalle_CFDI")
     ws.append(HEADERS); last=None
     q=select(Invoice,Concept).join(Concept,Concept.invoice_id==Invoice.id).order_by(Invoice.id,Concept.line_no)
-    for i,c in db.execute(q).yield_per(2000):
+for i, c in db.execute(q).yield_per(2000):
 
     first = i.id != last
 
-    ws.append(row(i,c,aux_map))
+    ws.append(
+        row(i, c, aux_map)
+    )
 
     last = i.id
     db.close(); wb.save(path); return path
