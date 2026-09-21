@@ -29,38 +29,32 @@ def upload(
     auxfile: UploadFile = File(...),
     s=Depends(db)
 ):
-ext = Path(xmlfile.filename or "").suffix.lower()
+    ext = Path(xmlfile.filename or "").suffix.lower()
 
-if ext not in (".xml",".zip"):
-    raise HTTPException(
-        400,
-        "Solo se permiten XML o ZIP"
+    if ext not in (".xml", ".zip"):
+        raise HTTPException(
+            400,
+            "Solo se permiten XML o ZIP"
+        )
+
+    data_dir = Path(
+        os.getenv("DATA_DIR", "/tmp")
+    ) / "uploads"
+
+    data_dir.mkdir(
+        parents=True,
+        exist_ok=True
     )
-
-data_dir = Path(
-    os.getenv("DATA_DIR","/tmp")
-) / "uploads"
-
-data_dir.mkdir(
-    parents=True,
-    exist_ok=True
-)
 
     path = data_dir / f"{uuid.uuid4().hex}{ext}"
 
     with path.open("wb") as f:
-        shutil.copyfileobj(
-            xmlfile.file,
-            f
-        )
+        shutil.copyfileobj(xmlfile.file, f)
 
     aux_path = data_dir / f"aux_{uuid.uuid4().hex}.xlsx"
 
     with open(aux_path, "wb") as f:
-        shutil.copyfileobj(
-            auxfile.file,
-            f
-        )
+        shutil.copyfileobj(auxfile.file, f)
 
     job = Job(
         filename=xmlfile.filename,
