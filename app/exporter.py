@@ -71,7 +71,7 @@ def row(i,c,first,aux_map):
         aux.get("NUM_OPERACION",""),
         aux.get("FECHA_OPE_BANCO",""),
         aux.get("VALOR_OPE_BANCO",""),
-        aux.get("tc","")
+        aux.get("tc",""),
         i.id,
         i.issuer_rfc,
         i.issuer_name,
@@ -131,37 +131,40 @@ def row(i,c,first,aux_map):
 
     ]
 def create_export():
+
+    db = SessionLocal()
+
     jobs = db.query(Job).all()
 
-aux_map = {}
+    aux_map = {}
 
-for job in jobs:
+    for job in jobs:
 
-    if not job.aux_file:
-        continue
+        if not job.aux_file:
+            continue
 
-    try:
+        try:
 
-        df = pd.read_excel(job.aux_file)
+            df = pd.read_excel(job.aux_file)
 
-        df["UUID"] = (
-            df["UUID"]
-            .astype(str)
-            .str.upper()
-            .str.strip()
-        )
+            df["UUID"] = (
+                df["UUID"]
+                .astype(str)
+                .str.upper()
+                .str.strip()
+            )
 
-        aux_map.update(
-            df.set_index("UUID")
-              .to_dict("index")
-        )
+            aux_map.update(
+                df.set_index("UUID")
+                  .to_dict("index")
+            )
 
-    except:
-        pass
+        except Exception:
+            pass
     out=Path(os.getenv("DATA_DIR","/tmp"))/"exports"; out.mkdir(parents=True,exist_ok=True)
     path=out/"detalle_cfdi.xlsx"; wb=Workbook(write_only=True); ws=wb.create_sheet("Detalle_CFDI")
     ws.append(HEADERS); db=SessionLocal(); last=None
     q=select(Invoice,Concept).join(Concept,Concept.invoice_id==Invoice.id).order_by(Invoice.id,Concept.line_no)
     for i,c in db.execute(q).yield_per(2000):
-        first=i.id!=last; ws.append(row(i,c,first)); last=i.id
+        first=i.id!=last ws.append(row(i,c,first,aux_map)); last=i.id
     db.close(); wb.save(path); return path
