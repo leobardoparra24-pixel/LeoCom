@@ -174,4 +174,6 @@ for i, c in db.execute(q).yield_per(2000):
     )
 
     last = i.id
-    db.close(); wb.save(path); return path
+    db.close()
+    wb.save(path)
+    return path
