@@ -21,72 +21,60 @@ def entries(path):
     else: yield p.name,p.read_bytes()
 def process_job(job_id):
 
-    db = SessionLocal()
-    job = db.get(Job, job_id)
+    d**= SessionLocal()
+    job = db.get**ob, job_id)
 
     try:
 
-        items = list(entries(job.stored_path))
-
+        it**s = list(entries(job.stored_path)**
         job.total = len(items)
-        job.status = "processing"
+ **     job.status = "processing"
 
-        db.commit()
+ **     db.commit()
 
-        for name, data in items:
+        for nam** data in items:
 
-            try:
+            try:**                invd, cons = pars**cfdi(data, name)
 
-                invd, cons = parse_cfdi(data, name)
-
-                if db.query(Invoice).filter(
-                    Invoice.uuid == invd["uuid"]
-                ).first():
-
-                    job.duplicates += 1
+               **f db.query(Invoice).filter(
+     **             Invoice.uuid == invd**uuid"]
+                ).first():**                    job.duplicate**+= 1
 
                 else:
 
-                    inv = Invoice(**invd)
+    **              inv = Invoice(**inv**
 
-                    db.add**nv)
-                    db.flush(**
-                    for c in con**
-                        db.add(
-**                          Concept**                                i**oice_id=inv.id,
-                 **             **c
-                **          )
-                     ** )
+                    db.add(inv)**                   db.flush()
 
-                    job.valid**= 1
+  **                for c in cons:
+  **                    db.add(
+     **                     Concept(
+   **                           invoic**id=inv.id,
+                      **        **c
+                     **     )
+                        )
+**                   job.valid += 1**            except Exception as e**
+                import traceback**               print(traceback.fo**at_exc())
 
-            except Exception**s e:
+                db.rol**ack()
 
-                import trac**ack
-                print(traceba**.format_exc())
+                job = db.g**(Job, job_id)
 
-                d**rollback()
+                jo**errors += 1
 
-                job =**b.get(Job, job_id)
+                job.**ssage = (
+                    job**essage or ""
+                ) + **{name}: {e}\n"
 
-             ** job.errors += 1
+            job.p**cessed += 1
+            db.commit**
 
-               **ob.message = (
-                  **job.message or ""
-               ** + f"{name}: {e}\n"
+        job.status = "completed**        db.commit()
 
-            **b.processed += 1
+    except E**eption as e:
 
-            db.commit()
-
-        job.status = "completed"
-
-        db.commit()
-
-    except Exception as e:
-
-        import traceback
-        print(traceback.format_exc())
+        import trac**ack
+        print(traceback.forma**exc())
 
         job.status = "failed"
         job.message = str(e)
