@@ -37,47 +37,47 @@ def upload(
             "Solo se permiten XML o ZIP"
         )
 
-    data_dir = Path(
+        data_dir = Path(
         os.getenv("DATA_DIR","/tmp")
     ) / "uploads"
 
-    data_dir.mkdir(
+        data_dir.mkdir(
         parents=True,
         exist_ok=True
     )
 
-    path = data_dir / f"{uuid.uuid4().hex}{ext}"
+        path = data_dir / f"{uuid.uuid4().hex}{ext}"
 
-    with path.open("wb") as f:
+        with path.open("wb") as f:
         shutil.copyfileobj(
             xmlfile.file,
             f
         )
 
-    aux_path = (
+        aux_path = (
         data_dir /
         f"aux_{uuid.uuid4().hex}.xlsx"
     )
 
-    with open(aux_path,"wb") as f:
+        with open(aux_path,"wb") as f:
         shutil.copyfileobj(
             auxfile.file,
             f
         )
 
-    job = Job(
+        job = Job(
         filename=xmlfile.filename,
         stored_path=str(path),
         aux_file=str(aux_path)
     )
 
-    s.add(job)
+        s.add(job)
     s.commit()
     s.refresh(job)
 
-    process_job(job.id)
+        process_job(job.id)
 
-    return RedirectResponse("/",303)
+        return RedirectResponse("/",303)
 @app.get("/export")
 def export_all():
     path=create_export(); return FileResponse(path,filename="Detalle_CFDI.xlsx")
