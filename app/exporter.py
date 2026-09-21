@@ -161,19 +161,40 @@ def create_export():
 
         except Exception:
             pass
-    out=Path(os.getenv("DATA_DIR","/tmp"))/"exports"; out.mkdir(parents=True,exist_ok=True)
-    path=out/"detalle_cfdi.xlsx"; wb=Workbook(write_only=True); ws=wb.create_sheet("Detalle_CFDI")
-    ws.append(HEADERS); last=None
-    q=select(Invoice,Concept).join(Concept,Concept.invoice_id==Invoice.id).order_by(Invoice.id,Concept.line_no)
-for i, c in db.execute(q).yield_per(2000):
+    out = Path(os.getenv("DATA_DIR","/tmp")) / "exports"
+    out.mkdir(parents=True, exist_ok=True)
 
-    first = i.id != last
+    path = out / "detalle_cfdi.xlsx"
 
-    ws.append(
-        row(i, c, aux_map)
+    wb = Workbook(write_only=True)
+    ws = wb.create_sheet("Detalle_CFDI")
+
+    ws.append(HEADERS)
+
+    last = None
+
+    q = (
+        select(Invoice, Concept)
+        .join(
+            Concept,
+            Concept.invoice_id == Invoice.id
+        )
+        .order_by(
+            Invoice.id,
+            Concept.line_no
+        )
     )
 
-    last = i.id
+    for i, c in db.execute(q).yield_per(2000):
+
+        ws.append(
+            row(i, c, aux_map)
+        )
+
+        last = i.id
+
     db.close()
+
     wb.save(path)
+
     return path
