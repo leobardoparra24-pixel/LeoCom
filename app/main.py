@@ -31,21 +31,32 @@ def upload(
 ):
     ext = Path(xmlfile.filename or "").suffix.lower()
     if ext not in (".xml",".zip"): raise HTTPException(400,"Solo se permiten XML o ZIP")
-    data_dir=Path(os.getenv("DATA_DIR","/tmp"))/"uploads"; data_dir.mkdir(parents=True,exist_ok=True)
-    path=data_dir/f"{uuid.uuid4().hex}{ext}"
-    with path.open("wb") as f:
-    shutil.copyfileobj(xmlfile.file,f)
+    data_dir = Path(os.getenv("DATA_DIR","/tmp")) / "uploads"
+data_dir.mkdir(parents=True, exist_ok=True)
+
+path = data_dir / f"{uuid.uuid4().hex}{ext}"
+
+with path.open("wb") as f:
+    shutil.copyfileobj(xmlfile.file, f)
+
+aux_path = data_dir / f"aux_{uuid.uuid4().hex}.xlsx"
+
+with open(aux_path, "wb") as f:
+    shutil.copyfileobj(auxfile.file, f)
+
 job = Job(
     filename=xmlfile.filename,
     stored_path=str(path),
     aux_file=str(aux_path)
-); s.add(job); s.commit(); s.refresh(job)
-    aux_path = data_dir / f"aux_{uuid.uuid4().hex}.xlsx"
+)
 
-with open(aux_path, "wb") as f:
-    shutil.copyfileobj(auxfile.file, f)
-    process_job(job.id)    
-    return RedirectResponse("/",303)
+s.add(job)
+s.commit()
+s.refresh(job)
+
+process_job(job.id)
+
+return RedirectResponse("/",303)
 @app.get("/export")
 def export_all():
     path=create_export(); return FileResponse(path,filename="Detalle_CFDI.xlsx")
