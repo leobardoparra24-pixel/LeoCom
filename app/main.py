@@ -40,7 +40,7 @@ job = Job(
     stored_path=str(path),
     aux_file=str(aux_path)
 ); s.add(job); s.commit(); s.refresh(job)
-    aux_path = uploads / f"aux_{uuid4().hex}.xlsx"
+    aux_path = data_dir / f"aux_{uuid.uuid4().hex}.xlsx"
 
 with open(aux_path, "wb") as f:
     shutil.copyfileobj(auxfile.file, f)
