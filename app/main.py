@@ -29,9 +29,9 @@ def upload(
     auxfile: UploadFile = File(...),
     s=Depends(db)
 ):
-    ext = Path(xmlfile.filename or "").suffix.lower()
+ext = Path(xmlfile.filename or "").suffix.lower()
 
-    if ext not in (".xml",".zip"):
+if ext not in (".xml",".zip"):
     raise HTTPException(
         400,
         "Solo se permiten XML o ZIP"
