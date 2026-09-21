@@ -31,30 +31,24 @@ def process_job(job_id):
                     inv=Invoice(**invd); db.add(inv); db.flush()
                     for c in cons: db.add(Concept(invoice_id=inv.id,**c))
                     job.valid+=1
-            except Exception as e:
-                import traceback
-                print(traceback.format_exc())
+except Exception as e:
 
-                db.rollback()
-                job=db.get(Job,job_id)
-                aux_df = pd.read_excel(job.aux_file)
+    import traceback
+    print(traceback.format_exc())
 
-aux_df["UUID"] = (
-    aux_df["UUID"]
-    .astype(str)
-    .str.upper()
-    .str.strip()
-)
+    db.rollback()
 
-aux_map = (
-    aux_df
-    .set_index("UUID")
-    .to_dict("index")
-)
-                job.errors+=1
-                job.message=(job.message or "")+f"{name}: {e}\n"
-            job.processed+=1; db.commit()
-        job.status="completed"; db.commit()
+    job = db.get(Job, job_id)
+
+    job.errors += 1
+
+    job.message = (
+        job.message or ""
+    ) + f"{name}: {e}\n"
+
+    job.processed += 1
+
+    db.commit()
     except Exception as e:
         import traceback
         print(traceback.format_exc())
