@@ -103,24 +103,25 @@
         <section class="card">
             <h2>Nueva carga</h2>
 
-<form action="/upload" method="post" enctype="multipart/form-data">
-    <div class="campo">
-        <label for="xmlfile">XML o ZIP</label>
-        <input id="xmlfile" type="file" name="xmlfile" accept=".xml,.zip" required>
-    </div>
-    <div class="campo">
-        <label for="auxfile">Excel auxiliar</label>
-        <input
-            id="auxfile"
-            type="file"
-            name="auxfile"
-            accept=".xlsx,.xls"
-            required
-        >
-    </div>
+            <form action="/upload" method="post" enctype="multipart/form-data">
+                <div class="campo">
+                    <label for="xmlfile">XML o ZIP</label>
+                    <input id="xmlfile" type="file" name="xmlfile" accept=".xml,.zip" required>
+                </div>
+                <div class="campo">
+                    <label for="auxfile">Excel auxiliar</label>
+                    <input
+                        id="auxfile"
+                        type="file"
+                        name="auxfile"
+                        accept=".xlsx,.xls"
+                        required
+                    >
+                </div>
 
-    <button type="submit">Cargar y procesar</button>
-</form>
+                <button type="submit">Cargar y procesar</button>
+            </form>
+        </section>
 
         <section class="card">
             <h2>Trabajos recientes</h2>
@@ -140,7 +141,7 @@
                 </thead>
 
                 <tbody>
-                    {% for j in jobs %}
+                    {% for job in jobs %}
                     <tr>
                         <td>{{ job.id }}</td>
                         <td>{{ job.filename }}</td>
@@ -150,20 +151,18 @@
                         <td>{{ job.duplicates }}</td>
                         <td>{{ job.errors }}</td>
                         <td>
-                            {% if job.status == "completed" %}    
+                            {% if job.status == "completed" %}
                                 <a class="btn" href="/export/{{ job.id }}">Descargar</a>
                             {% endif %}
-                         </td>
-                     </tr>
-                     {% endfor %}
-                 </tbody>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
             </table>
         </section>
 
         <section class="card">
-            /export
-                Generar Excel de una sola hoja
-            </a>
+            <a class="btn" href="/export">Generar Excel de una sola hoja</a>
 
             <p>
                 El archivo contiene una fila por concepto y agrega los datos
