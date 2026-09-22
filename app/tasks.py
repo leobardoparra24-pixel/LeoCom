@@ -47,8 +47,7 @@ def process_job(job_id):
 
                 else:
 
-                    inv = Invoice(**invd)
-
+                    inv = Invoice(**invd, job_id=job_id)
                     db.add(inv)
                     db.flush()
 
