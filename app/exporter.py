@@ -130,71 +130,47 @@ def row(i,c,aux_map):
         c.unit_key
 
     ]
-def create_export():
+def create_export(job_id: int | None = None):
 
-    db = SessionLocal
+    db = SessionLocal()
 
-    jobs = db.query(Job).all()
+    jobs = db.query(Job).all() if job_id is None else [db.get(Job, job_id)]
 
     aux_map = {}
 
     for job in jobs:
-
-        if not job.aux_file:
+        if not job or not job.aux_file:
             continue
-
         try:
-
             df = pd.read_excel(job.aux_file)
-
-            df["UUID"] = (
-                df["UUID"]
-                .astype(str)
-                .str.upper()
-                .str.strip()
-            )
-
-            aux_map.update(
-                df.set_index("UUID")
-                  .to_dict("index")
-            )
-
+            df["UUID"] = df["UUID"].astype(str).str.upper().str.strip()
+            aux_map.update(df.set_index("UUID").to_dict("index"))
         except Exception:
             pass
-    out = Path(os.getenv("DATA_DIR","/tmp")) / "exports"
+
+    out = Path(os.getenv("DATA_DIR", "/tmp")) / "exports"
     out.mkdir(parents=True, exist_ok=True)
 
-    path = out / "detalle_cfdi.xlsx"
+    filename = f"detalle_cfdi_job{job_id}.xlsx" if job_id else "detalle_cfdi_todos.xlsx"
+    path = out / filename
 
     wb = Workbook(write_only=True)
     ws = wb.create_sheet("Detalle_CFDI")
-
     ws.append(HEADERS)
-
-    last = None
 
     q = (
         select(Invoice, Concept)
-        .join(
-            Concept,
-            Concept.invoice_id == Invoice.id
-        )
-        .order_by(
-            Invoice.id,
-            Concept.line_no
-        )
+        .join(Concept, Concept.invoice_id == Invoice.id)
+        .order_by(Invoice.id, Concept.line_no)
     )
 
+    if job_id is not None:
+        q = q.where(Invoice.job_id == job_id)
+
     for i, c in db.execute(q).yield_per(2000):
-
-        ws.append(
-            row(i, c, aux_map)
-        )
-
-        last = i.id
+        ws.append(row(i, c, aux_map))
 
     db.close()
-
     wb.save(path)
 
     return path
