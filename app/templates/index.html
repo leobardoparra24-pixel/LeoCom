@@ -103,32 +103,20 @@
         <section class="card">
             <h2>Nueva carga</h2>
 
-            /upload
-                <div class="campo">
-                    <label for="xmlfile">XML o ZIP</label>
-                    <input
-                        id="xmlfile"
-                        type="file"
-                        name="xmlfile"
-                        accept=".xml,.zip"
-                        required
-                    >
-                </div>
+            <form action="/upload" method=>
+        <label for="xmlfile">XML o ZIP</label>
+        <input id="xmlfile" type="file" name="xmlfile" accept=".xml,.zip" required>
+    </div>
 
-                <div class="campo">
-                    <label for="auxfile">Excel auxiliar</label>
-                    <input
-                        id="auxfile"
-                        type="file"
-                        name="auxfile"
-                        accept=".xlsx,.xls"
-                        required
-                    >
-                </div>
+    <div class="campo">
+        <label for="auxfile">Excel auxiliar</label>
+        <input id="auxfile" type="file" name="auxfile" accept=".xlsx,.xls" required>
+    </div>
 
-                <button type="submit">Cargar y procesar</button>
-            </form>
-        </section>
+    <button type="submit">Cargar y procesar</button>
+</form>
+
+</section>
 
         <section class="card">
             <h2>Trabajos recientes</h2>
@@ -163,10 +151,8 @@
         </section>
 
         <section class="card">
-            <a class="btn" href="/export">
- Excel de una sola hoja
-            </a>
-
+            <a class="btn" href="/export">na sola hoja
+</a>
             <p>
                 El archivo contiene una fila por concepto y agrega los datos
                 del Excel auxiliar mediante coincidencia por UUID.
