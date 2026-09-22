@@ -25,6 +25,8 @@ class Job(Base):
 class Invoice(Base):
     __tablename__="invoices"
     id: Mapped[int]=mapped_column(primary_key=True)
+    job_id: Mapped[int | None] = mapped_column(ForeignKey("jobs.id", ondelete="CASCADE"), nullable=True, index=True)
+    uuid: Mapped[str]=mapped_column(String(50),unique=True,index=True)
     uuid: Mapped[str]=mapped_column(String(50),unique=True,index=True)
     sha256: Mapped[str]=mapped_column(String(64),index=True)
     source_file: Mapped[str]=mapped_column(Text)
