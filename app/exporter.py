@@ -130,6 +130,40 @@ def row(i,c,aux_map):
         c.unit_key
 
     ]
+
+def _find_uuid_column(columns):
+    """Busca una columna que sea 'UUID' sin importar mayusculas/espacios."""
+    for col in columns:
+        if str(col).strip().upper() == "UUID":
+            return col
+    return None
+
+def _load_aux_map(job, aux_map, warnings):
+    if not job.aux_file:
+        return
+
+    try:
+        df = pd.read_excel(job.aux_file)
+    except Exception as e:
+        warnings.append(f"Job {job.id}: no se pudo leer el Excel auxiliar ({e})")
+        return
+
+    uuid_col = _find_uuid_column(df.columns)
+
+    if uuid_col is None:
+        warnings.append(
+            f"Job {job.id}: el Excel auxiliar no tiene una columna 'UUID'. "
+            f"Columnas encontradas: {list(df.columns)}"
+        )
+        return
+
+    try:
+        df[uuid_col] = df[uuid_col].astype(str).str.upper().str.strip()
+        aux_map.update(df.set_index(uuid_col).to_dict("index"))
+    except Exception as e:
+        warnings.append(f"Job {job.id}: error al procesar el Excel auxiliar ({e})")
+
+
 def create_export(job_id: int | None = None):
 
     db = SessionLocal()
@@ -137,16 +171,16 @@ def create_export(job_id: int | None = None):
     jobs = db.query(Job).all() if job_id is None else [db.get(Job, job_id)]
 
     aux_map = {}
+    warnings = []
 
     for job in jobs:
-        if not job or not job.aux_file:
+        if not job:
             continue
-        try:
-            df = pd.read_excel(job.aux_file)
-            df["UUID"] = df["UUID"].astype(str).str.upper().str.strip()
-            aux_map.update(df.set_index("UUID").to_dict("index"))
-        except Exception:
-            pass
+        _load_aux_map(job, aux_map, warnings)
+
+    if warnings:
+        # Se imprime en los logs de Render para poder diagnosticar sin adivinar
+        print("AVISOS create_export:\n" + "\n".join(warnings))
 
     out = Path(os.getenv("DATA_DIR", "/tmp")) / "exports"
     out.mkdir(parents=True, exist_ok=True)
@@ -171,6 +205,7 @@ def create_export(job_id: int | None = None):
         ws.append(row(i, c, aux_map))
 
     db.close()
+
     wb.save(path)
 
     return path
