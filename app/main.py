@@ -89,3 +89,16 @@ def export_all():
     path=create_export(); return FileResponse(path,filename="Detalle_CFDI.xlsx")
 @app.get("/health")
 def health(): return {"status":"ok"}
+    
+@app.get("/export/{job_id}")
+def export_job(job_id: int, s=Depends(db)):
+    job = s.get(Job, job_id)
+    if not job:
+        raise HTTPException(404, "Trabajo no encontrado")
+    path = create_export(job_id)
+    return FileResponse(path, filename=f"Detalle_CFDI_{job_id}.xlsx")
+
+@app.get("/export")
+def export_all():
+    path = create_export()
+    return FileResponse(path, filename="Detalle_CFDI_todos.xlsx")
