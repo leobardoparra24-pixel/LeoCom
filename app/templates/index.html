@@ -135,22 +135,28 @@
                         <th>Correctos</th>
                         <th>Duplicados</th>
                         <th>Errores</th>
+                        <th>Descarga</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     {% for j in jobs %}
                     <tr>
-                        <td>{{ j.id }}</td>
-                        <td>{{ j.filename }}</td>
-                        <td class="{{ j.status }}">{{ j.status }}</td>
-                        <td>{{ j.processed }} / {{ j.total }}</td>
-                        <td>{{ j.valid }}</td>
-                        <td>{{ j.duplicates }}</td>
-                        <td title="{{ j.message or '' }}">{{ j.errors }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
+                        <td>{{ job.id }}</td>
+                        <td>{{ job.filename }}</td>
+                        <td class="{{ job.status }}">{{ job.status }}</td>
+                        <td>{{ job.processed }} / {{ job.total }}</td>
+                        <td>{{ job.valid }}</td>
+                        <td>{{ job.duplicates }}</td>
+                        <td>{{ job.errors }}</td>
+                        <td>
+                            {% if job.status == "completed" %}    
+                                <a class="btn" href="/export/{{ job.id }}">Descargar</a>
+                            {% endif %}
+                         </td>
+                     </tr>
+                     {% endfor %}
+                 </tbody>
             </table>
         </section>
 
