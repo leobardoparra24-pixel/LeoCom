@@ -19,10 +19,25 @@ def db():
     s=SessionLocal()
     try: yield s
     finally:s.close()
-@app.get("/",response_class=HTMLResponse)
-def home(request:Request,s=Depends(db)):
-    jobs=s.scalars(select(Job).order_by(Job.id.desc()).limit(30)).all()
-    return templates.TemplateResponse("index.html",{"request":request,"jobs":jobs})
+@app.head("/")
+def head_home():
+    return Response(status_code=200)
+
+
+@app.get("/", response_class=HTMLResponse)
+def home(request: Request, s=Depends(db)):
+    jobs = s.scalars(
+        select(Job).order_by(Job.id.desc()).limit(30)
+    ).all()
+
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "jobs": jobs
+        }
+    )
+
 @app.post("/upload")
 def upload(
     xmlfile: UploadFile = File(...),
