@@ -13,8 +13,17 @@ templates=Jinja2Templates(directory="app/templates")
 @app.on_event("startup")
 def startup():
     for _ in range(20):
-        try: Base.metadata.create_all(engine); return
-        except Exception: time.sleep(2)
+        try:
+            Base.metadata.create_all(engine)
+            break
+        except Exception:
+            time.sleep(2)
+
+    try:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE invoices ADD COLUMN IF NOT EXISTS job_id INTEGER"))
+    except Exception as e:
+        print("No se pudo agregar job_id:", e)
 def db():
     s=SessionLocal()
     try: yield s
