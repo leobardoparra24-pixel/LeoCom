@@ -159,6 +159,19 @@ def _load_aux_map(job, aux_map, warnings):
 
     try:
         df[uuid_col] = df[uuid_col].astype(str).str.upper().str.strip()
+
+        # Quita filas sin UUID real (vacias, NaN, filas en blanco al final)
+        df = df[df[uuid_col].notna()]
+        df = df[~df[uuid_col].isin(["", "NAN", "NONE"])]
+
+        dup_count = df[uuid_col].duplicated().sum()
+        if dup_count:
+            warnings.append(
+                f"Job {job.id}: {dup_count} UUID(s) duplicados en el Excel auxiliar, "
+                f"se usa la primera coincidencia de cada uno."
+            )
+            df = df.drop_duplicates(subset=uuid_col, keep="first")
+
         aux_map.update(df.set_index(uuid_col).to_dict("index"))
     except Exception as e:
         warnings.append(f"Job {job.id}: error al procesar el Excel auxiliar ({e})")
